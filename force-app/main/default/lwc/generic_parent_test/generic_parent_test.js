@@ -1,149 +1,193 @@
 /*
-    This component is for testing out the behavior of HTML, LWC, etc. to ensure we get the appropriate behavior for the generic LWC Interface. Each LWC I make can be made to interact with other components through these relationships. This relationship is for an unrelated component that may be on the same page, but must be communicated with through the lightning message channel.
+    This component is for testing out the behavior of HTML, LWC, etc. to ensure we get the appropriate behavior for the generic LWC Interface. This relationship is for an the parent component, so stick the new component under test into this component's HTML.
 */
 
 import { LightningElement } from "lwc";
 
-import { LWC_Toast, DOM_Interface } from "c/lwc_js_common";
+import { LWC_Toast } from "c/lwc_generic";
+
+//import { Model, View } from "c/lwc_mvc";
+import { View } from "c/lwc_mvc";
 
 import queryFromString from "@salesforce/apex/ApexDataInterface.queryFromString";
 
 
 export default class Generic_parent_test extends LightningElement {
-  domInterface;
+  view;
 
   currencyFormatter;
 
   toastHandler;
 
-  constructor() {
-    super();
 
-    this.domInterface = new DOM_Interface(this.template);
 
-    this.currencyFormatter = new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD"
-    });
+    constructor() {
+        super();
 
-    this.toastHandler = new LWC_Toast(this);
-  }
+        this.view = new View(this.template);
 
-  initializeCosts() {
-    this.domInterface.setAttribute("ChassisCost", "value", "0");
-    this.domInterface.setAttribute("BodyCost", "value", "0");
-  }
+        this.currencyFormatter = new Intl.NumberFormat("en-US", {
+            style: "currency",
+            currency: "USD"
+        });
 
-  initializeDOMInterface() {
-    this.domInterface.insertElement("OpportunityLookUp");
-    this.domInterface.insertElement("OpportunityLink");
-
-    this.domInterface.insertElement("ChassisCost");
-    this.domInterface.insertElement("BodyCost");
-    this.domInterface.insertElement("Total");
-
-    this.initializeCosts();
-  }
-
-  addCosts() {
-    let sumOfCosts = 0;
-
-    if (this.domInterface.checkForElement("Total")) {
-      if (
-        this.domInterface.checkForElement("ChassisCost") &&
-        this.domInterface.checkForElement("BodyCost")
-      ) {
-        sumOfCosts =
-          Number(this.domInterface.getAttribute("ChassisCost", "value")) +
-          Number(this.domInterface.getAttribute("BodyCost", "value"));
-      }
-
-      this.domInterface.setAttribute(
-        "Total",
-        "innerHTML",
-        this.currencyFormatter.format(sumOfCosts)
-      );
+        this.toastHandler = new LWC_Toast(this);
     }
-  }
 
-  queryCostsFromOpportunity() {
-    return queryFromString({
-      queryString:
-        "SELECT Product2.RecordType.Name, Product2.List_Price__c" +
-        " FROM OpportunityLineItem" +
-        " WHERE OpportunityId='" +
-        this.domInterface.getAttribute("OpportunityLookUp", "value") +
-        "'"
-    });
-  }
 
-  handleOpportunityChosen(event) {
-    // Make sure to clear out these values for the new ones, in case one of them doesn't have a record
-    this.initializeCosts();
+    insertViews() {
+        this.view.insertElement("OpportunityLookUp");
+        this.view.insertElement("OpportunityLink");
 
-    if (event.detail.value.length > 0) {
-      // Checking if this component has a value is nasty, this is how to do it
-      this.queryCostsFromOpportunity()
-        .then((records) => {
-          let record;
 
-          if (records) {
-            if (records.length === 0) {
-              this.toastHandler.displayChoice(
-                "Note:",
+        this.view.insertElement("ChassisCost");
+        this.view.insertElement("BodyCost");
+        this.view.insertElement("Total");
 
-                "No products found were found for this Opportunity",
 
-                "info",
+        this.view.insertElement("ShippingAddress");
+    }
 
-                "sticky"
-              );
-            } else {
-              for (const recordIndex in records) {
-                if (
-                  records[recordIndex].Product2.RecordType.Name === "Chassis"
-                ) {
-                  this.domInterface.setAttribute(
-                    "ChassisCost",
-                    "value",
-                    records[recordIndex].Product2.List_Price__c
-                  );
-                } else if (
-                  records[recordIndex].Product2.RecordType.Name ===
-                  "Service Body"
-                ) {
-                  this.domInterface.setAttribute(
-                    "BodyCost",
-                    "value",
-                    records[recordIndex].Product2.List_Price__c
-                  );
-                } else {
-                  this.toastHandler.displayChoice(
-                    "Note:",
 
-                    "An product found wasn't of type Chassis or Service Body, but rather of type " +
-                      record.Product2.RecordType.Name,
+    setInitialCosts() {
+        this.view.setAttribute("ChassisCost", "value", "0");
+        this.view.setAttribute("BodyCost", "value", "0");
+    }
 
-                    "info",
+    setInitialAddress() {
+        this.view.setAttribute('ShippingAddress', 'street', '');
+        this.view.setAttribute('ShippingAddress', 'city', '');
+        this.view.setAttribute('ShippingAddress', 'province', '');
+        this.view.setAttribute('ShippingAddress', 'country', '');
+        this.view.setAttribute('ShippingAddress', 'postalCode', '');
+    }
 
-                    "sticky"
-                  );
-                }
-              }
-            }
-          }
-        })
-        .catch((err) => {
-          this.toastHandler.displayError(
-            "Error",
-            "An error occurred when handling queryCostsFromOpportunity()",
-            err
-          );
+
+    initializeViews() {
+        this.setInitialCosts();
+
+        this.setInitialAddress();
+    }
+
+
+
+    addCosts() {
+        let sumOfCosts = 0;
+
+        if (this.view.checkForElement("Total")) {
+        if (
+            this.view.checkForElement("ChassisCost") &&
+            this.view.checkForElement("BodyCost")
+        ) {
+            sumOfCosts =
+            Number(this.view.getAttribute("ChassisCost", "value")) +
+            Number(this.view.getAttribute("BodyCost", "value"));
+        }
+
+        this.view.setAttribute(
+            "Total",
+            "innerHTML",
+            this.currencyFormatter.format(sumOfCosts)
+        );
+        }
+    }
+
+
+
+    queryCostsFromOpportunity() {
+        return queryFromString({
+        queryString:
+            "SELECT Product2.RecordType.Name, Product2.List_Price__c" +
+            " FROM OpportunityLineItem" +
+            " WHERE OpportunityId='" +
+            this.view.getAttribute("OpportunityLookUp", "value") +
+            "'"
         });
     }
-  }
 
-  renderedCallback() {
-    this.initializeDOMInterface();
-  }
+
+    queryAddressFromOpportunity() {
+        return queryFromString({
+        queryString:
+            "SELECT Account.ShippingAddress" +
+            " FROM Opportunity" +
+            " WHERE Id='" +
+            this.view.getAttribute("OpportunityLookUp", "value") +
+            "'"
+        });
+    }
+
+
+
+    handleOpportunityChosen(event) {
+        // Make sure to clear out these values for the new ones, in case one of them doesn't have a record
+        this.initializeViews();
+
+        if (event.detail.value.length > 0) {
+            // Checking if this component has a value is nasty, this is how to do it
+            this.queryCostsFromOpportunity().then((records) => {
+                let record;
+
+                if (records) {
+                    if (records.length === 0) {
+                        this.toastHandler.displayInfo('No products found were found for this Opportunity');
+                    } else {
+                    for (const recordIndex in records) {
+                        if (
+                            records[recordIndex].Product2.RecordType.Name === "Chassis"
+                            ) {
+                            this.view.setAttribute(
+                                "ChassisCost",
+                                "value",
+                                records[recordIndex].Product2.List_Price__c
+                            );
+                        } else if (records[recordIndex].Product2.RecordType.Name === "Service Body") {
+                            this.view.setAttribute(
+                                "BodyCost",
+                                "value",
+                                records[recordIndex].Product2.List_Price__c
+                            );
+                        }
+                    }
+                    }
+                }
+            }).catch((err) => {
+                this.toastHandler.displayError( err.body ? err.body.message : err.message );
+            });
+
+
+
+            this.queryAddressFromOpportunity().then(records => {
+                let record;
+
+                if (records) {
+                    record = records[0];
+
+                    if(record.Account.ShippingAddress) {
+                        this.view.setAttribute('ShippingAddress', 'street', record.Account.ShippingAddress.street);
+                        this.view.setAttribute('ShippingAddress', 'city', record.Account.ShippingAddress.city);
+                        this.view.setAttribute('ShippingAddress', 'province', record.Account.ShippingAddress.state);
+                        this.view.setAttribute('ShippingAddress', 'country', record.Account.ShippingAddress.country);
+                        this.view.setAttribute('ShippingAddress', 'postalCode', record.Account.ShippingAddress.postalCode);
+                    }else {
+                        this.toastHandler.displayInfo('No ShippingAddress found for this Opportunity');
+                    }
+                }
+            }).catch(err => {
+                this.toastHandler.displayError( err.body ? err.body.message : err.message );
+            });
+        }
+
+
+
+
+    }
+
+
+
+    renderedCallback() {
+        this.insertViews();
+
+        this.initializeViews();
+    }
 }
