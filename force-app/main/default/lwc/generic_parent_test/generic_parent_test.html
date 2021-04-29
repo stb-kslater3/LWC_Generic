@@ -51,7 +51,7 @@
         </div>
 
         <div class="slds-align_absolute-center slds-m-top_medium">
-            <lightning-button variant="brand" label="Add" onclick={addCosts}>
+            <lightning-button variant="brand" label="Add" onclick={handleAddCosts}>
             </lightning-button>
         </div>
 
@@ -78,6 +78,64 @@
 
                     Product Cost: {product.cost}
                 </div>
+            </template>
+        </div>
+
+
+        <div class="slds-align_absolute-center slds-m-top_large">
+            <lightning-input
+                label="Name"
+                data-id="GenericName"
+            >
+            </lightning-input>
+        </div>
+
+        <div class="slds-align_absolute-center slds-m-top_medium">
+            Opportunity: 
+            <p data-id="GenericOpportunity"></p>
+        </div>
+
+        <div class="slds-align_absolute-center slds-m-top_medium">
+            <lightning-input label="Street" data-id="GenericStreet"></lightning-input>
+        </div>
+
+        <div class="slds-align_absolute-center slds-m-top_xsmall">
+            <lightning-input label="City" data-id="GenericCity"></lightning-input>
+        </div>
+
+        <div class="slds-align_absolute-center slds-m-top_xsmall">
+            <lightning-input label="State" data-id="GenericState"></lightning-input>
+        </div>
+
+        <div class="slds-align_absolute-center slds-m-top_xsmall">
+            <lightning-input label="Country" data-id="GenericCountry"></lightning-input>
+        </div>
+
+        <div class="slds-align_absolute-center slds-m-top_xsmall">
+            <lightning-input label="Postal Code" data-id="GenericPostalCode"></lightning-input>
+        </div>
+        
+        <div class="slds-align_absolute-center slds-m-top_medium">
+            <lightning-input 
+                label="Cost"
+                type="number"
+                formatter="currency"
+                step="0.01"
+                data-id="GenericCost"
+            >
+            </lightning-input>
+        </div>
+
+
+        <div class="slds-align_absolute-center slds-m-top_medium">
+            <template if:false={hasLWCGeneric}>
+                <lightning-button variant="brand" label="Insert" onclick={handleInsertGenerics}>
+                </lightning-button>
+            </template>
+
+            <template if:true={hasLWCGeneric}>
+                <lightning-button variant="brand" label="Update" onclick={handleUpdateGenerics}>
+                </lightning-button>
             </template>
         </div>
     </div>
