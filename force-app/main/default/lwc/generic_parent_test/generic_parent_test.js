@@ -2,7 +2,9 @@
     This component is for testing out the behavior of HTML, LWC, etc. to ensure we get the appropriate behavior for the generic LWC Interface. This relationship is for an the parent component, so stick the new component under test into this component's HTML.
 */
 
-import { LightningElement } from "lwc";
+import { LightningElement, track } from "lwc";
+
+import { NavigationMixin } from 'lightning/navigation';
 
 import { LWC_Toast } from "c/lwc_generic";
 
@@ -12,13 +14,14 @@ import { View } from "c/lwc_mvc";
 import queryFromString from "@salesforce/apex/ApexDataInterface.queryFromString";
 
 
-export default class Generic_parent_test extends LightningElement {
+export default class Generic_parent_test extends NavigationMixin(LightningElement) {
   view;
 
   currencyFormatter;
 
   toastHandler;
 
+  @track productList;
 
 
     constructor() {
@@ -32,6 +35,9 @@ export default class Generic_parent_test extends LightningElement {
         });
 
         this.toastHandler = new LWC_Toast(this);
+
+
+        this.productList = [];
     }
 
 
@@ -49,6 +55,11 @@ export default class Generic_parent_test extends LightningElement {
     }
 
 
+    setInitialOpportunityLink() {
+        this.view.setAttribute("OpportunityLink", "value", '');
+        this.view.setAttribute("OpportunityLink", "label", '');
+    }
+
     setInitialCosts() {
         this.view.setAttribute("ChassisCost", "value", "0");
         this.view.setAttribute("BodyCost", "value", "0");
@@ -62,11 +73,19 @@ export default class Generic_parent_test extends LightningElement {
         this.view.setAttribute('ShippingAddress', 'postalCode', '');
     }
 
+    setInitialProductList() {
+        this.productList = [];
+    }
+
 
     initializeViews() {
+        this.setInitialOpportunityLink();
+
         this.setInitialCosts();
 
         this.setInitialAddress();
+
+        this.setInitialProductList();
     }
 
 
@@ -109,7 +128,7 @@ export default class Generic_parent_test extends LightningElement {
     queryAddressFromOpportunity() {
         return queryFromString({
         queryString:
-            "SELECT Account.ShippingAddress" +
+            "SELECT Name, Account.ShippingAddress" +
             " FROM Opportunity" +
             " WHERE Id='" +
             this.view.getAttribute("OpportunityLookUp", "value") +
@@ -132,23 +151,40 @@ export default class Generic_parent_test extends LightningElement {
                     if (records.length === 0) {
                         this.toastHandler.displayInfo('No products found were found for this Opportunity');
                     } else {
-                    for (const recordIndex in records) {
-                        if (
-                            records[recordIndex].Product2.RecordType.Name === "Chassis"
-                            ) {
-                            this.view.setAttribute(
-                                "ChassisCost",
-                                "value",
-                                records[recordIndex].Product2.List_Price__c
-                            );
-                        } else if (records[recordIndex].Product2.RecordType.Name === "Service Body") {
-                            this.view.setAttribute(
-                                "BodyCost",
-                                "value",
-                                records[recordIndex].Product2.List_Price__c
-                            );
+                        try {
+                            for (const recordIndex in records) {
+                                this.productList.push({
+                                    name: records[recordIndex].Product2.RecordType.Name,
+                                    
+                                    index: this.productList.length
+                                });
+
+                                if(records[recordIndex].Product2.List_Price__c) {
+                                    this.productList[this.productList.length - 1].cost = this.currencyFormatter.format(records[recordIndex].Product2.List_Price__c);
+                                }else {
+                                    this.productList[this.productList.length - 1].cost = this.currencyFormatter.format(0);
+                                }
+
+
+                                if (
+                                    records[recordIndex].Product2.RecordType.Name === "Chassis" && records[recordIndex].Product2.List_Price__c
+                                    ) {
+                                    this.view.setAttribute(
+                                        "ChassisCost",
+                                        "value",
+                                        records[recordIndex].Product2.List_Price__c
+                                    );
+                                } else if (records[recordIndex].Product2.RecordType.Name === "Service Body" && records[recordIndex].Product2.List_Price__c) {
+                                    this.view.setAttribute(
+                                        "BodyCost",
+                                        "value",
+                                        records[recordIndex].Product2.List_Price__c
+                                    );
+                                }
+                            }
+                        }catch(e) {
+                            this.toastHandler.displayError( err.body ? err.body.message : err.message );
                         }
-                    }
                     }
                 }
             }).catch((err) => {
@@ -172,6 +208,26 @@ export default class Generic_parent_test extends LightningElement {
                     }else {
                         this.toastHandler.displayInfo('No ShippingAddress found for this Opportunity');
                     }
+
+
+                    this[NavigationMixin.GenerateUrl]({
+                        type: 'standard__recordPage',
+        
+                        attributes: {
+                            recordId: this.view.getAttribute("OpportunityLookUp", "value"),
+                            actionName: 'view'
+                        }
+                    }).then(url => {
+                        this.view.setAttribute("OpportunityLink", "value", window.location.host + url);
+
+                        if(record) {
+                            this.view.setAttribute("OpportunityLink", "label", record.Name);
+                        }else {
+                            this.view.setAttribute("OpportunityLink", "label", 'Link to Opportunity');
+                        }
+                    }).catch(err => {
+                        this.toastHandler.displayError( err.body ? err.body.message : err.message );
+                    });
                 }
             }).catch(err => {
                 this.toastHandler.displayError( err.body ? err.body.message : err.message );
@@ -187,7 +243,5 @@ export default class Generic_parent_test extends LightningElement {
 
     renderedCallback() {
         this.insertViews();
-
-        this.initializeViews();
     }
 }

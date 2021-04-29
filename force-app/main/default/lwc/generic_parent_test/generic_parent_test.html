@@ -63,11 +63,22 @@
 
         <div class="slds-align_absolute-center slds-m-top_large">
             Shipping Address: 
-            
+
             <lightning-formatted-address
                 data-id="ShippingAddress"    
             >
             </lightning-formatted-address>
+        </div>
+
+
+        <div class="slds-align_absolute-center slds-m-top_large">
+            <template for:each={productList} for:item="product">
+                <div key={product.index} class="slds-m-bottom_small">
+                    Product Name: {product.name}
+
+                    Product Cost: {product.cost}
+                </div>
+            </template>
         </div>
     </div>
 </template>
