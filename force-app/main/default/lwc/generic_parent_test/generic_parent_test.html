@@ -127,15 +127,82 @@
         </div>
 
 
-        <div class="slds-align_absolute-center slds-m-top_medium">
+        <div>
             <template if:false={hasLWCGeneric}>
-                <lightning-button variant="brand" label="Insert" onclick={handleInsertGenerics}>
-                </lightning-button>
+                <div class="slds-align_absolute-center slds-m-top_medium">
+                    <lightning-button variant="brand" label="Insert" onclick={handleInsertGenerics}>
+                    </lightning-button>
+                </div>
             </template>
 
             <template if:true={hasLWCGeneric}>
-                <lightning-button variant="brand" label="Update" onclick={handleUpdateGenerics}>
-                </lightning-button>
+                <div class="slds-align_absolute-center slds-m-top_medium">
+                    <lightning-button variant="brand" label="Update" onclick={handleUpdateGenerics}>
+                    </lightning-button>
+                </div>
+
+
+                <div class="slds-m-top_large">
+                    <div class="slds-align_absolute-center">
+                        <lightning-input
+                            label="Name"
+                            data-id="addDynamicName"
+                        >
+                        </lightning-input>
+                    </div>
+
+                    <div class="slds-align_absolute-center">
+                        <lightning-input
+                            label="Text"
+                            data-id="addDynamicText"
+                        >
+                        </lightning-input>
+                    </div>
+
+                    <div class="slds-align_absolute-center">
+                        <lightning-input
+                            label="Number"
+                            data-id="addDynamicNumber"
+                        >
+                        </lightning-input>
+                    </div>
+
+                    <div class="slds-align_absolute-center slds-m-top_small">
+                        <lightning-button variant="brand" label="Add Dynamic" onclick={handleAddDynamic}>
+                        </lightning-button>
+                    </div>
+                </div>
+            </template>
+        </div>
+
+
+        <div class="slds-align_absolute-center slds-m-top_large">
+            <template for:each={lwcDynamicList} for:item="lwcDynamic">
+                <div key={lwcDynamic.index} class="slds-m-bottom_small">
+                    <div>
+                        <lightning-input
+                            label="Name"
+                            value={lwcDynamic.name}
+                        >
+                        </lightning-input>
+                    </div>
+
+                    <div>
+                        <lightning-input
+                            label="Text"
+                            value={lwcDynamic.text}
+                        >
+                        </lightning-input>
+                    </div>
+
+                    <div>
+                        <lightning-input
+                            label="Number"
+                            value={lwcDynamic.number}
+                        >
+                        </lightning-input>
+                    </div>
+                </div>
             </template>
         </div>
     </div>

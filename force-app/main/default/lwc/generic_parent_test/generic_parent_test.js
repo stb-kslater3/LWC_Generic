@@ -6,14 +6,14 @@ import { LightningElement, track } from "lwc";
 
 import { NavigationMixin } from 'lightning/navigation';
 
-import { LWC_Toast } from "c/lwc_generic";
+import { LWC_Toast } from "c/lwc_generic_prototype";
 
 //import { Model, View } from "c/lwc_mvc";
-import { View } from "c/lwc_mvc";
+import { View } from "c/lwc_mvc_prototype";
 
-import queryFromString from "@salesforce/apex/ApexDataInterface.queryFromString";
-import insertRecord from "@salesforce/apex/ApexDataInterface.insertRecord";
-import updateRecordFromId from "@salesforce/apex/ApexDataInterface.updateRecordFromId";
+import queryFromString from "@salesforce/apex/Apex_Generic_Prototype.queryFromString";
+import insertRecord from "@salesforce/apex/Apex_Generic_Prototype.insertRecord";
+import updateRecordFromId from "@salesforce/apex/Apex_Generic_Prototype.updateRecordFromId";
 
 
 export default class Generic_parent_test extends NavigationMixin(LightningElement) {
@@ -27,6 +27,8 @@ export default class Generic_parent_test extends NavigationMixin(LightningElemen
 
   hasLWCGeneric;
   lwcGeneric_Id;
+
+  @track lwcDynamicList;
 
 
     constructor() {
@@ -43,6 +45,8 @@ export default class Generic_parent_test extends NavigationMixin(LightningElemen
 
 
         this.productList = [];
+
+        this.lwcDynamicList = [];
     }
 
 
@@ -69,7 +73,6 @@ export default class Generic_parent_test extends NavigationMixin(LightningElemen
         this.view.insertElement('GenericPostalCode');
         
         this.view.insertElement('GenericCost');
-
     }
 
 
@@ -111,6 +114,19 @@ export default class Generic_parent_test extends NavigationMixin(LightningElemen
     }
 
 
+    setInitialAddDynamics() {
+        if(this.view.checkForElement('addDynamicName')) {
+            this.view.setAttribute('addDynamicName', 'value', '');
+            this.view.setAttribute('addDynamicText', 'value', '');
+            this.view.setAttribute('addDynamicNumber', 'value', 0);
+        }
+    }
+
+    setInitialLWCDynamicsList() {
+        this.lwcDynamicList = [];
+    }
+
+
     initializeViews() {
         this.setInitialOpportunityLink();
 
@@ -121,6 +137,10 @@ export default class Generic_parent_test extends NavigationMixin(LightningElemen
         this.setInitialProductList();
 
         this.setInitialGenerics();
+
+        this.setInitialAddDynamics();
+
+        this.setInitialLWCDynamicsList()
     }
 
 
@@ -205,42 +225,42 @@ export default class Generic_parent_test extends NavigationMixin(LightningElemen
     }
 
 
+    handleAddDynamic() {
+        insertRecord({
+            objectName: 'LWC_Dynamic__c',
+            
+            fieldValuePairs: {
+                'Name': this.view.getAttribute('addDynamicName', 'value'),
 
-    queryCostsFromOpportunity() {
-        return queryFromString({
-        queryString:
-            "SELECT Product2.RecordType.Name, Product2.List_Price__c" +
-            " FROM OpportunityLineItem" +
-            " WHERE OpportunityId='" +
-            this.view.getAttribute("OpportunityLookUp", "value") +
-            "'"
+                'Text__c': this.view.getAttribute('addDynamicText', 'value'),
+
+                'Number__c': Number(this.view.getAttribute('addDynamicNumber', 'value')),
+
+                'LWC_Generic__c': this.lwcGeneric_Id
+            }
+        }).then(isSuccess => {
+            if(!isSuccess) {
+                this.toastHandler.displayWarning('Failed to Insert LWC_Dynamic');
+            }else {
+                this.toastHandler.displaySuccess('LWC_Dynamic Record Inserted');
+
+                this.lwcDynamicList.push({
+                    name: this.view.getAttribute('addDynamicName', 'value'),
+    
+                    text: this.view.getAttribute('addDynamicText', 'value'),
+    
+                    number: Number(this.view.getAttribute('addDynamicNumber', 'value')),
+
+                    index: this.lwcDynamicList.length
+                });
+
+
+                this.setInitialAddDynamics();
+            }
+        }).catch(err => {
+            this.toastHandler.displayError( err.body ? err.body.message : err.message );
         });
     }
-
-
-    queryAddressFromOpportunity() {
-        return queryFromString({
-        queryString:
-            "SELECT Name, Account.ShippingAddress" +
-            " FROM Opportunity" +
-            " WHERE Id='" +
-            this.view.getAttribute("OpportunityLookUp", "value") +
-            "'"
-        });
-    }
-
-
-    queryGenericFromOpportunity() {
-        return queryFromString({
-            queryString:
-                "SELECT Id, Name, Opportunity__c, Street__c, City__c, State__c, Country__c, PostalCode__c, Cost__c" +
-                " FROM LWC_Generic__c" +
-                " WHERE Opportunity__c='" +
-                    this.view.getAttribute("OpportunityLookUp", "value") +
-                "'"
-        });
-    }
-
 
 
     handleOpportunityChosen(event) {
@@ -351,7 +371,6 @@ export default class Generic_parent_test extends NavigationMixin(LightningElemen
                         this.hasLWCGeneric = true;
                         this.lwcGeneric_Id = record.Id;
 
-
                         this.view.setAttribute('GenericName', 'value', record.Name);
 
                         this.view.setAttribute('GenericStreet', 'value', record.Street__c);
@@ -361,6 +380,29 @@ export default class Generic_parent_test extends NavigationMixin(LightningElemen
                         this.view.setAttribute('GenericPostalCode', 'value', record.PostalCode__c);
 
                         this.view.setAttribute('GenericCost', 'value', record.Cost__c);
+
+
+                        this.queryDynamicsFromOpportunity().then(records => {
+                            if(records) {
+                                if(records.length > 0) {
+                                    for(const recordIndex in records) {
+                                        this.lwcDynamicList.push({
+                                            name: records[recordIndex].Name,
+                            
+                                            text: records[recordIndex].Text__c,
+                            
+                                            number: Number(records[recordIndex].Number__c),
+                        
+                                            index: this.lwcDynamicList.length
+                                        });
+                                    }
+                                }else {
+                                    this.toastHandler.displayInfo('No LWC_Dynamics found for this LWC_Generic');
+                                }
+                            }
+                        }).catch(err => {
+                            this.toastHandler.displayError( err.body ? err.body.message : err.message );
+                        });
                     }else {
                         this.toastHandler.displayInfo('No LWC_Generic found for this Opportunity');
 
@@ -375,7 +417,65 @@ export default class Generic_parent_test extends NavigationMixin(LightningElemen
 
 
 
+    queryCostsFromOpportunity() {
+        return queryFromString({
+        queryString:
+            "SELECT Product2.RecordType.Name, Product2.List_Price__c" +
+            " FROM OpportunityLineItem" +
+            " WHERE OpportunityId='" +
+            this.view.getAttribute("OpportunityLookUp", "value") +
+            "'"
+        });
+    }
+
+
+    queryAddressFromOpportunity() {
+        return queryFromString({
+        queryString:
+            "SELECT Name, Account.ShippingAddress" +
+            " FROM Opportunity" +
+            " WHERE Id='" +
+            this.view.getAttribute("OpportunityLookUp", "value") +
+            "'"
+        });
+    }
+
+
+    queryGenericFromOpportunity() {
+        return queryFromString({
+            queryString:
+                "SELECT Id, Name, Opportunity__c, Street__c, City__c, State__c, Country__c, PostalCode__c, Cost__c" +
+                " FROM LWC_Generic__c" +
+                " WHERE Opportunity__c='" +
+                    this.view.getAttribute("OpportunityLookUp", "value") +
+                "'"
+        });
+    }
+
+    queryDynamicsFromOpportunity() {
+        return queryFromString({
+            queryString:
+                "SELECT Id, Name, Number__c, Text__c" +
+                " FROM LWC_Dynamic__c" +
+                " WHERE LWC_Generic__c='" +
+                    this.lwcGeneric_Id +
+                "'"
+        });
+    }
+
+
+
     renderedCallback() {
         this.insertViews();
+
+        if(this.hasLWCGeneric) {
+            this.view.insertElement('addDynamicName');
+            this.view.insertElement('addDynamicText');
+            this.view.insertElement('addDynamicNumber');
+        }else {
+            this.view.removeElement('addDynamicName');
+            this.view.removeElement('addDynamicText');
+            this.view.removeElement('addDynamicNumber');
+        }
     }
 }
