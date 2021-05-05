@@ -1,0 +1,223 @@
+<template>
+    <div class="slds-box slds-theme_shade">
+        <div class="slds-clearfix">
+            <div>
+                <div class="slds-align_absolute-center">
+                    <lightning-record-edit-form object-api-name="OpportunityLineItem">
+                        <lightning-input-field
+                            field-name="OpportunityId"
+                            data-id="OpportunityLookUp"
+                            data-track="true"
+                            onchange={handleOpportunityChosen}
+                        >
+                        </lightning-input-field>
+                    </lightning-record-edit-form>
+                </div>
+            </div>
+
+            <div>
+                <div class="slds-align_absolute-center">
+                Opportunity:
+                <lightning-formatted-url
+                    target="_blank"
+                    data-id="OpportunityLink"
+                    data-track="true"
+                ></lightning-formatted-url>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="slds-clearfix slds-m-top_medium">
+            <div class="slds-align_absolute-center">
+                <lightning-input
+                    type="number"
+                    formatter="currency"
+                    step="0.01"
+                    label="Chassis Cost"
+                    data-id="ChassisCost"
+                    data-track="true"
+                >
+                </lightning-input>
+            </div>
+
+            <div class="slds-align_absolute-center">
+                <lightning-input
+                    type="number"
+                    formatter="currency"
+                    step="0.01"
+                    label="Body Cost"
+                    data-id="BodyCost"
+                    data-track="true"
+                >
+                </lightning-input>
+            </div>
+        </div>
+
+        <div class="slds-align_absolute-center slds-m-top_medium">
+            <lightning-button variant="brand" label="Add" onclick={handleAddCosts}>
+            </lightning-button>
+        </div>
+
+        <div class="slds-align_absolute-center slds-m-top_medium">
+            Total:
+            <p data-id="Total" data-track="true">$0.00</p>
+        </div>
+
+
+        <div class="slds-align_absolute-center slds-m-top_large">
+            Shipping Address: 
+
+            <lightning-formatted-address
+                data-id="ShippingAddress"
+                data-track="true"    
+            >
+            </lightning-formatted-address>
+        </div>
+
+
+        <div class="slds-align_absolute-center slds-m-top_large">
+            <template for:each={productList} for:item="product">
+                <div key={product.index} class="slds-m-bottom_small" data-track="true">
+                    Product Name: {product.name}
+
+                    Product Cost: {product.cost}
+                </div>
+            </template>
+        </div>
+
+
+        <div class="slds-align_absolute-center slds-m-top_large">
+            <lightning-input
+                label="Name"
+                data-id="GenericName"
+                data-track="true"
+            >
+            </lightning-input>
+        </div>
+
+        <div class="slds-align_absolute-center slds-m-top_medium">
+            Opportunity: 
+            <p data-id="GenericOpportunity" data-track="true"></p>
+        </div>
+
+        <div class="slds-align_absolute-center slds-m-top_medium">
+            <lightning-input label="Street" data-id="GenericStreet" data-track="true"></lightning-input>
+        </div>
+
+        <div class="slds-align_absolute-center slds-m-top_xsmall">
+            <lightning-input label="City" data-id="GenericCity" data-track="true"></lightning-input>
+        </div>
+
+        <div class="slds-align_absolute-center slds-m-top_xsmall">
+            <lightning-input label="State" data-id="GenericState" data-track="true"></lightning-input>
+        </div>
+
+        <div class="slds-align_absolute-center slds-m-top_xsmall">
+            <lightning-input label="Country" data-id="GenericCountry" data-track="true"></lightning-input>
+        </div>
+
+        <div class="slds-align_absolute-center slds-m-top_xsmall">
+            <lightning-input label="Postal Code" data-id="GenericPostalCode" data-track="true"></lightning-input>
+        </div>
+        
+        <div class="slds-align_absolute-center slds-m-top_medium">
+            <lightning-input 
+                label="Cost"
+                type="number"
+                formatter="currency"
+                step="0.01"
+                data-id="GenericCost"
+                data-track="true"
+            >
+            </lightning-input>
+        </div>
+
+
+        <div>
+            <template if:false={hasLWCGeneric}>
+                <div class="slds-align_absolute-center slds-m-top_medium">
+                    <lightning-button variant="brand" label="Insert" onclick={handleInsertGenerics}>
+                    </lightning-button>
+                </div>
+            </template>
+
+            <template if:true={hasLWCGeneric}>
+                <div class="slds-align_absolute-center slds-m-top_medium">
+                    <lightning-button variant="brand" label="Update" onclick={handleUpdateGenerics}>
+                    </lightning-button>
+                </div>
+
+
+                <div class="slds-m-top_large">
+                    <div class="slds-align_absolute-center">
+                        <lightning-input
+                            label="Name"
+                            data-id="addDynamicName"
+                            data-track="true"
+                        >
+                        </lightning-input>
+                    </div>
+
+                    <div class="slds-align_absolute-center">
+                        <lightning-input
+                            label="Text"
+                            data-id="addDynamicText"
+                            data-track="true"
+                        >
+                        </lightning-input>
+                    </div>
+
+                    <div class="slds-align_absolute-center">
+                        <lightning-input
+                            label="Number"
+                            data-id="addDynamicNumber"
+                            data-track="true"
+                        >
+                        </lightning-input>
+                    </div>
+
+                    <div class="slds-align_absolute-center slds-m-top_small">
+                        <lightning-button variant="brand" label="Add Dynamic" onclick={handleAddDynamic}>
+                        </lightning-button>
+                    </div>
+                </div>
+            </template>
+        </div>
+
+
+        <div class="slds-align_absolute-center slds-m-top_large">
+            <template for:each={lwcDynamicList} for:item="lwcDynamic">
+                <div key={lwcDynamic.index} class="slds-m-bottom_small">
+                    <div>
+                        <lightning-input
+                            label="Name"
+                            value={lwcDynamic.name}
+                            data-track="true"
+                        >
+                        </lightning-input>
+                    </div>
+
+                    <div>
+                        <lightning-input
+                            label="Text"
+                            value={lwcDynamic.text}
+                            data-track="true"
+                        >
+                        </lightning-input>
+                    </div>
+
+                    <div>
+                        <lightning-input
+                            label="Number"
+                            value={lwcDynamic.number}
+                            data-track="true"
+                        >
+                        </lightning-input>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+</template>
+  
