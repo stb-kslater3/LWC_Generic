@@ -17,26 +17,25 @@ import { View } from "c/lwc_mvc_prototype2";
 
 
 
-
 export default class Common_prototype_1 extends NavigationMixin(LightningElement) {
-  view;
+    view;
 
-  currencyFormatter;
+    currencyFormatter;
 
-  toastHandler;
+    toastHandler;
 
-  @track productList;
+    @track productList;
 
-  hasLWCGeneric;
-  lwcGeneric_Id;
+    hasLWCGeneric;
+    lwcGeneric_Id;
 
-  @track lwcDynamicList;
+    @track lwcDynamicList;
 
 
     constructor() {
         super();
 
-        this.view = new View(); //new View(this.template);
+        this.view = new View();
 
         this.currencyFormatter = new Intl.NumberFormat("en-US", {
             style: "currency",
@@ -50,34 +49,6 @@ export default class Common_prototype_1 extends NavigationMixin(LightningElement
 
         this.lwcDynamicList = [];
     }
-
-
-    /*
-    insertViews() {
-        this.view.insertElement("OpportunityLookUp");
-        this.view.insertElement("OpportunityLink");
-
-
-        this.view.insertElement("ChassisCost");
-        this.view.insertElement("BodyCost");
-        this.view.insertElement("Total");
-
-
-        this.view.insertElement("ShippingAddress");
-
-
-        this.view.insertElement('GenericName');
-        this.view.insertElement('GenericOpportunity');
-
-        this.view.insertElement('GenericStreet');
-        this.view.insertElement('GenericCity');
-        this.view.insertElement('GenericState');
-        this.view.insertElement('GenericCountry');
-        this.view.insertElement('GenericPostalCode');
-        
-        this.view.insertElement('GenericCost');
-    }
-    */
 
 
     setInitialOpportunityLink() {
@@ -98,6 +69,7 @@ export default class Common_prototype_1 extends NavigationMixin(LightningElement
         this.view.setAttribute('ShippingAddress', 'postalCode', '');
     }
 
+    
     setInitialProductList() {
         this.productList = [];
     }
@@ -131,6 +103,7 @@ export default class Common_prototype_1 extends NavigationMixin(LightningElement
         this.view.setAttribute('addDynamicText', 'value', '');
         this.view.setAttribute('addDynamicNumber', 'value', 0);
     }
+
 
     setInitialLWCDynamicsList() {
         this.lwcDynamicList = [];
@@ -181,22 +154,19 @@ export default class Common_prototype_1 extends NavigationMixin(LightningElement
             this.lwcDynamicList.forEach(dynamic => {
                 console.log( this.view.getAttribute(dynamic.dataIdName, 'value') );
             });
-            /*
-            // This one is coupled to the key's name
-            this.lwcDynamicList.forEach(dynamic => {
-                console.log(this.plNodes[this.plNodeIndices[dynamic.dataIdName]].value);
-            });
-            */
-
-            // Another way to think about, but coupled to the actual name
-            /*
-            for(let i = 0; i < this.lwcDynamicList.length; i++) {
-                console.log(this.plNodes[this.plNodeIndices['dynamicName_' + i]].value);
-            }
-            */
         }catch(err) {
             this.toastHandler.displayError(err.message);
         }
+    }
+
+    handleDynamicToggle() {
+        if(this.dynamicDC.toggle === false) {
+            this.dynamicDC.toggle = true;
+        }else {
+            this.dynamicDC.toggle = false;
+        }
+
+        console.log(this.dynamicDC.toggle);
     }
 
 
@@ -333,9 +303,7 @@ export default class Common_prototype_1 extends NavigationMixin(LightningElement
                                 }
 
 
-                                if (
-                                    records[recordIndex].Product2.RecordType.Name === "Chassis" && records[recordIndex].Product2.List_Price__c
-                                    ) {
+                                if (records[recordIndex].Product2.RecordType.Name === "Chassis" && records[recordIndex].Product2.List_Price__c) {
                                     this.view.setAttribute(
                                         "ChassisCost",
                                         "value",
@@ -422,8 +390,6 @@ export default class Common_prototype_1 extends NavigationMixin(LightningElement
                         this.view.setAttribute('GenericPostalCode', 'value', record.PostalCode__c);
 
                         this.view.setAttribute('GenericCost', 'value', record.Cost__c);
-
-                        //this.setInitialAddDynamics();
 
 
                         this.queryDynamicsFromOpportunity().then(records => {
@@ -516,38 +482,6 @@ export default class Common_prototype_1 extends NavigationMixin(LightningElement
 
 
     renderedCallback() {
-        /*
-        this.plNodes = this.template.querySelectorAll("[data-track='true']");
-        let ids = [];
-        this.plNodeIndices = {}
-        
-
-        let index = 0;
-        this.plNodes.forEach(node => {
-            ids.push(node.getAttribute('data-id'));
-
-            this.plNodeIndices[node.getAttribute('data-id')] = index;
-
-            index += 1;
-        });
-        console.log(ids);
-        console.log(this.plNodeIndices);
-        */
-
         this.view.updateNodes( this.template.querySelectorAll("[data-track='true']") );
-
-        /*
-        this.insertViews();
-
-        if(this.hasLWCGeneric) {
-            this.view.insertElement('addDynamicName');
-            this.view.insertElement('addDynamicText');
-            this.view.insertElement('addDynamicNumber');
-        }else {
-            this.view.removeElement('addDynamicName');
-            this.view.removeElement('addDynamicText');
-            this.view.removeElement('addDynamicNumber');
-        }
-        */
     }
 }
