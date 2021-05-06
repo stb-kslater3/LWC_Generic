@@ -8,18 +8,17 @@ import { NavigationMixin } from 'lightning/navigation';
 
 import { LWC_Toast } from "c/lwc_generic_prototype";
 
-//import { Model, View } from "c/lwc_mvc";
-import { View } from "c/lwc_mvc_prototype";
-
 import queryFromString from "@salesforce/apex/Apex_Generic_Prototype.queryFromString";
 import insertRecord from "@salesforce/apex/Apex_Generic_Prototype.insertRecord";
 import updateRecordFromId from "@salesforce/apex/Apex_Generic_Prototype.updateRecordFromId";
 
 
-export default class Common_prototype_1 extends NavigationMixin(LightningElement) {
-  plNodes;
-  plNodeIndices;
+import { View } from "c/lwc_mvc_prototype2";
 
+
+
+
+export default class Common_prototype_1 extends NavigationMixin(LightningElement) {
   view;
 
   currencyFormatter;
@@ -37,7 +36,7 @@ export default class Common_prototype_1 extends NavigationMixin(LightningElement
     constructor() {
         super();
 
-        this.view = new View(this.template);
+        this.view = new View(); //new View(this.template);
 
         this.currencyFormatter = new Intl.NumberFormat("en-US", {
             style: "currency",
@@ -53,6 +52,7 @@ export default class Common_prototype_1 extends NavigationMixin(LightningElement
     }
 
 
+    /*
     insertViews() {
         this.view.insertElement("OpportunityLookUp");
         this.view.insertElement("OpportunityLink");
@@ -77,6 +77,7 @@ export default class Common_prototype_1 extends NavigationMixin(LightningElement
         
         this.view.insertElement('GenericCost');
     }
+    */
 
 
     setInitialOpportunityLink() {
@@ -118,11 +119,17 @@ export default class Common_prototype_1 extends NavigationMixin(LightningElement
 
 
     setInitialAddDynamics() {
+        /*
         if(this.view.checkForElement('addDynamicName')) {
             this.view.setAttribute('addDynamicName', 'value', '');
             this.view.setAttribute('addDynamicText', 'value', '');
             this.view.setAttribute('addDynamicNumber', 'value', 0);
         }
+        */
+
+        this.view.setAttribute('addDynamicName', 'value', '');
+        this.view.setAttribute('addDynamicText', 'value', '');
+        this.view.setAttribute('addDynamicNumber', 'value', 0);
     }
 
     setInitialLWCDynamicsList() {
@@ -141,9 +148,9 @@ export default class Common_prototype_1 extends NavigationMixin(LightningElement
 
         this.setInitialGenerics();
 
-        this.setInitialAddDynamics();
+        //this.setInitialAddDynamics();
 
-        this.setInitialLWCDynamicsList()
+        this.setInitialLWCDynamicsList();
     }
 
 
@@ -171,10 +178,15 @@ export default class Common_prototype_1 extends NavigationMixin(LightningElement
 
     handleLogNames(event) {
         try{
+            this.lwcDynamicList.forEach(dynamic => {
+                console.log( this.view.getAttribute(dynamic.dataIdName, 'value') );
+            });
+            /*
             // This one is coupled to the key's name
             this.lwcDynamicList.forEach(dynamic => {
                 console.log(this.plNodes[this.plNodeIndices[dynamic.dataIdName]].value);
             });
+            */
 
             // Another way to think about, but coupled to the actual name
             /*
@@ -411,6 +423,8 @@ export default class Common_prototype_1 extends NavigationMixin(LightningElement
 
                         this.view.setAttribute('GenericCost', 'value', record.Cost__c);
 
+                        //this.setInitialAddDynamics();
+
 
                         this.queryDynamicsFromOpportunity().then(records => {
                             if(records) {
@@ -502,6 +516,7 @@ export default class Common_prototype_1 extends NavigationMixin(LightningElement
 
 
     renderedCallback() {
+        /*
         this.plNodes = this.template.querySelectorAll("[data-track='true']");
         let ids = [];
         this.plNodeIndices = {}
@@ -517,8 +532,11 @@ export default class Common_prototype_1 extends NavigationMixin(LightningElement
         });
         console.log(ids);
         console.log(this.plNodeIndices);
+        */
 
+        this.view.updateNodes( this.template.querySelectorAll("[data-track='true']") );
 
+        /*
         this.insertViews();
 
         if(this.hasLWCGeneric) {
@@ -530,5 +548,6 @@ export default class Common_prototype_1 extends NavigationMixin(LightningElement
             this.view.removeElement('addDynamicText');
             this.view.removeElement('addDynamicNumber');
         }
+        */
     }
 }
