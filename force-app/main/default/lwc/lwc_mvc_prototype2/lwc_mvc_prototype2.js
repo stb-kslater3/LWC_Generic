@@ -1,5 +1,11 @@
 
 
+class Model {
+
+}
+
+
+
 class View {
   _plNodes;
 
@@ -44,4 +50,4 @@ class View {
 
 
 
-export { View };
+export { Model, View };
