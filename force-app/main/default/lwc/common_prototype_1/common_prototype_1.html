@@ -78,7 +78,7 @@
 
         <div class="slds-align_absolute-center slds-m-top_large">
             <template for:each={productList} for:item="product">
-                <div key={product.index} class="slds-m-bottom_small" data-track="true">
+                <div key={product.index} class="slds-m-bottom_small" data-id={product.dataId} data-track="true">
                     Product Name: {product.name}
 
                     Product Cost: {product.cost}
@@ -182,6 +182,11 @@
                         </lightning-button>
                     </div>
                 </div>
+
+                <div>
+                    <lightning-button variant="brand" label="Log Names" onclick={handleLogNames}>
+                    </lightning-button>
+                </div>
             </template>
         </div>
 
@@ -193,6 +198,7 @@
                         <lightning-input
                             label="Name"
                             value={lwcDynamic.name}
+                            data-id={lwcDynamic.dataIdName}
                             data-track="true"
                         >
                         </lightning-input>
@@ -202,6 +208,7 @@
                         <lightning-input
                             label="Text"
                             value={lwcDynamic.text}
+                            data-id={lwcDynamic.dataIdText}
                             data-track="true"
                         >
                         </lightning-input>
@@ -211,6 +218,7 @@
                         <lightning-input
                             label="Number"
                             value={lwcDynamic.number}
+                            data-id={lwcDynamic.dataIdNumber}
                             data-track="true"
                         >
                         </lightning-input>

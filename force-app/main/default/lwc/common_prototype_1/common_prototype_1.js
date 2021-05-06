@@ -18,6 +18,7 @@ import updateRecordFromId from "@salesforce/apex/Apex_Generic_Prototype.updateRe
 
 export default class Common_prototype_1 extends NavigationMixin(LightningElement) {
   plNodes;
+  plNodeIndices;
 
   view;
 
@@ -168,6 +169,25 @@ export default class Common_prototype_1 extends NavigationMixin(LightningElement
     }
 
 
+    handleLogNames(event) {
+        try{
+            // This one is coupled to the key's name
+            this.lwcDynamicList.forEach(dynamic => {
+                console.log(this.plNodes[this.plNodeIndices[dynamic.dataIdName]].value);
+            });
+
+            // Another way to think about, but coupled to the actual name
+            /*
+            for(let i = 0; i < this.lwcDynamicList.length; i++) {
+                console.log(this.plNodes[this.plNodeIndices['dynamicName_' + i]].value);
+            }
+            */
+        }catch(err) {
+            this.toastHandler.displayError(err.message);
+        }
+    }
+
+
     handleInsertGenerics() {
         insertRecord({
             objectName: 'LWC_Generic__c',
@@ -253,6 +273,12 @@ export default class Common_prototype_1 extends NavigationMixin(LightningElement
     
                     number: Number(this.view.getAttribute('addDynamicNumber', 'value')),
 
+                    dataIdName: 'dynamicName_' + this.lwcDynamicList.length,
+
+                    dataIdText: 'dynamicText_' + this.lwcDynamicList.length,
+
+                    dataIdNumber: 'dynamicNumber_' + this.lwcDynamicList.length,
+
                     index: this.lwcDynamicList.length
                 });
 
@@ -285,6 +311,8 @@ export default class Common_prototype_1 extends NavigationMixin(LightningElement
                                     
                                     index: this.productList.length
                                 });
+
+                                this.productList[this.productList.length - 1].dataId = 'product_' + this.productList[this.productList.length - 1]['index'];
 
                                 if(records[recordIndex].Product2.List_Price__c) {
                                     this.productList[this.productList.length - 1].cost = this.currencyFormatter.format(records[recordIndex].Product2.List_Price__c);
@@ -394,6 +422,12 @@ export default class Common_prototype_1 extends NavigationMixin(LightningElement
                                             text: records[recordIndex].Text__c,
                             
                                             number: Number(records[recordIndex].Number__c),
+
+                                            dataIdName: 'dynamicName_' + this.lwcDynamicList.length,
+                        
+                                            dataIdText: 'dynamicText_' + this.lwcDynamicList.length,
+                        
+                                            dataIdNumber: 'dynamicNumber_' + this.lwcDynamicList.length,
                         
                                             index: this.lwcDynamicList.length
                                         });
@@ -470,11 +504,19 @@ export default class Common_prototype_1 extends NavigationMixin(LightningElement
     renderedCallback() {
         this.plNodes = this.template.querySelectorAll("[data-track='true']");
         let ids = [];
+        this.plNodeIndices = {}
+        
 
+        let index = 0;
         this.plNodes.forEach(node => {
             ids.push(node.getAttribute('data-id'));
+
+            this.plNodeIndices[node.getAttribute('data-id')] = index;
+
+            index += 1;
         });
         console.log(ids);
+        console.log(this.plNodeIndices);
 
 
         this.insertViews();
