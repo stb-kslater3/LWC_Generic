@@ -32,6 +32,8 @@ export default class Common_prototype_1 extends NavigationMixin(LightningElement
 
     @track lwcDynamicList;
 
+    numColumns;
+
 
     constructor() {
         super();
@@ -51,6 +53,8 @@ export default class Common_prototype_1 extends NavigationMixin(LightningElement
         this.productList = [];
 
         this.lwcDynamicList = [];
+
+        this.numColumns = 2;
     }
 
 
@@ -186,6 +190,10 @@ export default class Common_prototype_1 extends NavigationMixin(LightningElement
                     for (const recordIndex in records) {
                         this.productList.push({
                             name: records[recordIndex].Product2.RecordType.Name,
+
+                            row: this.productList.length / this.numColumns,
+
+                            col: this.productList.length % this.numColumns,
                             
                             index: this.productList.length
                         });
@@ -298,6 +306,10 @@ export default class Common_prototype_1 extends NavigationMixin(LightningElement
                                     dataIdText: 'dynamicText_' + this.lwcDynamicList.length,
                 
                                     dataIdNumber: 'dynamicNumber_' + this.lwcDynamicList.length,
+
+                                    row: this.lwcDynamicList.length / this.numColumns,
+
+                                    col: this.lwcDynamicList.length % this.numColumns,
                 
                                     index: this.lwcDynamicList.length
                                 });
@@ -406,24 +418,9 @@ export default class Common_prototype_1 extends NavigationMixin(LightningElement
 
 
     handleAddCosts() {
-        let sumOfCosts = 0;
+        let sumOfCosts = Number(this.view.getAttribute("ChassisCost", "value")) + Number(this.view.getAttribute("BodyCost", "value"));
 
-        if (this.view.checkForElement("Total")) {
-            if (
-                this.view.checkForElement("ChassisCost") &&
-                this.view.checkForElement("BodyCost")
-            ) {
-                sumOfCosts =
-                Number(this.view.getAttribute("ChassisCost", "value")) +
-                Number(this.view.getAttribute("BodyCost", "value"));
-            }
-
-            this.view.setAttribute(
-                "Total",
-                "innerHTML",
-                this.currencyFormatter.format(sumOfCosts)
-            );
-        }
+        this.view.setAttribute("Total", "innerHTML", this.currencyFormatter.format(sumOfCosts));
     }
 
 
