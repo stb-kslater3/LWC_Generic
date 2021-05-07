@@ -192,6 +192,45 @@
 
 
         <div class="slds-align_absolute-center slds-m-top_large">
+            <div style="max-height: 500px" class="slds-scrollable_y slds-box slds-box-xx_small slds-theme_default">
+                <div>
+                    <template for:each={lwcDynamicList} for:item="lwcDynamic">
+                        <div key={lwcDynamic.index} class="slds-m-bottom_small slds-box slds-box-xx_small slds-theme_shade">
+                            <div>
+                                <lightning-input
+                                    label="Name"
+                                    value={lwcDynamic.name}
+                                    data-id={lwcDynamic.dataIdName}
+                                    data-track="true"
+                                >
+                                </lightning-input>
+                            </div>
+
+                            <div>
+                                <lightning-input
+                                    label="Text"
+                                    value={lwcDynamic.text}
+                                    data-id={lwcDynamic.dataIdText}
+                                    data-track="true"
+                                >
+                                </lightning-input>
+                            </div>
+
+                            <div>
+                                <lightning-input
+                                    label="Number"
+                                    value={lwcDynamic.number}
+                                    data-id={lwcDynamic.dataIdNumber}
+                                    data-track="true"
+                                >
+                                </lightning-input>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <!--
             <template for:each={lwcDynamicList} for:item="lwcDynamic">
                 <div key={lwcDynamic.index} class="slds-m-bottom_small">
                     <div>
@@ -225,6 +264,7 @@
                     </div>
                 </div>
             </template>
+            -->
         </div>
     </div>
 </template>

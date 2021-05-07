@@ -134,6 +134,25 @@ export default class Common_prototype_1 extends NavigationMixin(LightningElement
     }
 
 
+    addToDynamicList(name, text, number) {
+        this.lwcDynamicList.push({
+            name: name,
+
+            text: text,
+
+            number: Number(number),
+
+            dataIdName: 'dynamicName_' + this.lwcDynamicList.length,
+
+            dataIdText: 'dynamicText_' + this.lwcDynamicList.length,
+
+            dataIdNumber: 'dynamicNumber_' + this.lwcDynamicList.length,
+
+            index: this.lwcDynamicList.length
+        });
+    }
+
+
     queryCostsFromOpportunity() {
         return queryFromString({
         queryString:
@@ -294,25 +313,7 @@ export default class Common_prototype_1 extends NavigationMixin(LightningElement
                     if(records) {
                         if(records.length > 0) {
                             for(const recordIndex in records) {
-                                this.lwcDynamicList.push({
-                                    name: records[recordIndex].Name,
-                    
-                                    text: records[recordIndex].Text__c,
-                    
-                                    number: Number(records[recordIndex].Number__c),
-
-                                    dataIdName: 'dynamicName_' + this.lwcDynamicList.length,
-                
-                                    dataIdText: 'dynamicText_' + this.lwcDynamicList.length,
-                
-                                    dataIdNumber: 'dynamicNumber_' + this.lwcDynamicList.length,
-
-                                    row: this.lwcDynamicList.length / this.numColumns,
-
-                                    col: this.lwcDynamicList.length % this.numColumns,
-                
-                                    index: this.lwcDynamicList.length
-                                });
+                                this.addToDynamicList(records[recordIndex].Name, records[recordIndex].Text__c, Number(records[recordIndex].Number__c));
                             }
                         }else {
                             this.toastHandler.displayInfo('No LWC_Dynamics found for this LWC_Generic');
@@ -395,22 +396,7 @@ export default class Common_prototype_1 extends NavigationMixin(LightningElement
         }else {
             this.toastHandler.displaySuccess('LWC_Dynamic Record Inserted');
 
-            this.lwcDynamicList.push({
-                name: this.view.getAttribute('addDynamicName', 'value'),
-
-                text: this.view.getAttribute('addDynamicText', 'value'),
-
-                number: Number(this.view.getAttribute('addDynamicNumber', 'value')),
-
-                dataIdName: 'dynamicName_' + this.lwcDynamicList.length,
-
-                dataIdText: 'dynamicText_' + this.lwcDynamicList.length,
-
-                dataIdNumber: 'dynamicNumber_' + this.lwcDynamicList.length,
-
-                index: this.lwcDynamicList.length
-            });
-
+            this.addToDynamicList(this.view.getAttribute('addDynamicName', 'value'), this.view.getAttribute('addDynamicText', 'value'), Number(this.view.getAttribute('addDynamicNumber', 'value')));
 
             this.setInitialAddDynamics();
         }
