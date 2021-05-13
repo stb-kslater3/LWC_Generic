@@ -208,6 +208,53 @@ System.debug(dateString);
     }
 
 
+    // . . . update multiple records
+    @AuraEnabled(cacheable=false)
+    public static Boolean updateRecords(String objectName, List<Map<String, Object>> records){
+      Boolean isUpdated = false;
+      List<sObject> recordObjects = new List<sObject>();
+
+      try {
+        for(Map<String, Object> fieldValuePairs : records) {
+          recordObjects.add( (sObject) Type.forName(objectName).newInstance() );
+        
+          for (String key : fieldValuePairs.keySet()) {
+            if(key.equalsIgnoreCase('date') || key.equalsIgnoreCase('date__c')) {
+              String originalString = (String) fieldValuePairs.get(key);
+              
+              originalString = originalString.split('Z')[0];
+              originalString = originalString.split('T')[0];
+
+              String[] dateSplit = originalString.split('-');
+
+              String dateString = dateSplit[1];
+              dateString += '/' + dateSplit[2];
+              dateString += '/' + dateSplit[0];
+
+              recordObjects.get(recordObjects.size() - 1).put(key, Date.parse(dateString));
+            }else {
+              recordObjects.get(recordObjects.size() - 1).put(key, fieldValuePairs.get(key));
+            }
+          }
+        }
+
+        Database.SaveResult[] results = Database.update(recordObjects, true);
+        
+        isUpdated = true;
+        for(Database.SaveResult result : results) {
+          if (!result.isSuccess()) {
+            isUpdated = false;
+          }
+        }
+
+        return isUpdated;
+      } catch (Exception e) {
+        throw new AuraHandledException(e.getMessage());
+      }
+    }
+
+
+
     // . . . insert a record
     @AuraEnabled(cacheable=false)
     public static Boolean insertRecord(String objectName, Map<String, Object> fieldValuePairs){
@@ -250,4 +297,48 @@ System.debug(dateString);
     }
 
 
+    // . . . insert multiple records
+    @AuraEnabled(cacheable=false)
+    public static Boolean insertRecords(String objectName, List<Map<String, Object>> records){
+      Boolean isInserted = false;
+      List<sObject> recordObjects = new List<sObject>();
+
+      try {
+        for(Map<String, Object> fieldValuePairs : records) {
+          recordObjects.add( (sObject) Type.forName(objectName).newInstance() );
+        
+          for (String key : fieldValuePairs.keySet()) {
+            if(key.equalsIgnoreCase('date') || key.equalsIgnoreCase('date__c')) {
+              String originalString = (String) fieldValuePairs.get(key);
+              
+              originalString = originalString.split('Z')[0];
+              originalString = originalString.split('T')[0];
+
+              String[] dateSplit = originalString.split('-');
+
+              String dateString = dateSplit[1];
+              dateString += '/' + dateSplit[2];
+              dateString += '/' + dateSplit[0];
+
+              recordObjects.get(recordObjects.size() - 1).put(key, Date.parse(dateString));
+            }else {
+              recordObjects.get(recordObjects.size() - 1).put(key, fieldValuePairs.get(key));
+            }
+          }
+        }
+
+        Database.SaveResult[] results = Database.insert(recordObjects, true);
+        
+        isInserted = true;
+        for(Database.SaveResult result : results) {
+          if (!result.isSuccess()) {
+            isInserted = false;
+          }
+        }
+
+        return isInserted;
+      } catch (Exception e) {
+        throw new AuraHandledException(e.getMessage());
+      }
+    }
   }
