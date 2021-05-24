@@ -24,7 +24,7 @@ class View {
               index += 1;
           });
       }catch(err) {
-          console.log(err.message);
+          console.error('Error in attempt to update plNodes with: ' + plNodes + '\n' + err.message);
       }
   }
 
@@ -33,17 +33,25 @@ class View {
       try {
           return this._plNodes[this._plNodeIndices[dataId]][attributeName];
       }catch(err) {
-          console.log('ERROR: ' + err.message);
-          console.log('In attempt to get ' + dataId + '[' + attributeName + ']');
+          console.error('Error in attempt to get ' + dataId + '[' + attributeName + ']' + '\n' + err.message);
       }
   }
+
 
   setAttribute(dataId, attributeName, attributeValue) {
       try {
           this._plNodes[this._plNodeIndices[dataId]][attributeName] = attributeValue;
       }catch(err) {
-          console.log('ERROR: ' + err.message);
-          console.log('In attempt to set ' + dataId + '[' + attributeName + ']');
+          console.error('Error in attempt to set ' + dataId + '[' + attributeName + ']' + '\n' + err.message);
+      }
+  }
+
+
+  getElementToCall(dataId) {
+      try {
+        return this._plNodes[this._plNodeIndices[dataId]];
+      }catch(err) {
+          console.error('Error in attempt to getElementToCall from plNodes with dataId: ' + dataId + '\n' + err.message);
       }
   }
 }
