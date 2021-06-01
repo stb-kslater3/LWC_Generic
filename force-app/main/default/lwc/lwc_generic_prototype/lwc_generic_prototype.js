@@ -12,62 +12,82 @@ class LWC_Toast {
 
 
     displayChoice(title, message, variant, mode) {
-        const toast = new ShowToastEvent({
-            title: title,
-            message: message,
-            variant: variant,
-            mode: mode
-        });
+        try {
+            const toast = new ShowToastEvent({
+                title: title,
+                message: message,
+                variant: variant,
+                mode: mode
+            });
 
-        this.templateContext.dispatchEvent(toast);
+            this.templateContext.dispatchEvent(toast);
+        }catch(err) {
+            console.error(err.oby ? err.body.message : err.message);
+        }
     }
 
 
     displayInfo(message) {
-        const toast = new ShowToastEvent({
-            title: 'Info',
-            message: message,
-            variant: "info",
-            mode: "sticky"
-        });
+        try {
+            const toast = new ShowToastEvent({
+                title: 'Info',
+                message: message,
+                variant: "info",
+                mode: "sticky"
+            });
 
-        this.templateContext.dispatchEvent(toast);
+            this.templateContext.dispatchEvent(toast);
+        }catch(err) {
+            console.error(err.oby ? err.body.message : err.message);
+        }
     }
 
 
     displayWarning(message) {
-        const toast = new ShowToastEvent({
-            title: 'Warning',
-            message: message,
-            variant: "warning",
-            mode: "sticky"
-        });
+        try {
+            const toast = new ShowToastEvent({
+                title: 'Warning',
+                message: message,
+                variant: "warning",
+                mode: "sticky"
+            });
 
-        this.templateContext.dispatchEvent(toast);
+            this.templateContext.dispatchEvent(toast);
+        }catch(err) {
+            console.error(err.oby ? err.body.message : err.message);
+        }
     }
 
 
     displaySuccess(message) {
-        const toast = new ShowToastEvent({
-            title: 'Success',
-            message: message,
-            variant: "success",
-            mode: "sticky"
-        });
+        try {
+            const toast = new ShowToastEvent({
+                title: 'Success',
+                message: message,
+                variant: "success",
+                mode: "sticky"
+            });
 
-        this.templateContext.dispatchEvent(toast);
+            this.templateContext.dispatchEvent(toast);
+        }catch(err) {
+            console.error(err.oby ? err.body.message : err.message);
+        }
     }
 
 
     displayError(errorMessage) {
-        const toast = new ShowToastEvent({
-            title: 'Error',
-            message: errorMessage,
-            variant: "error",
-            mode: "sticky"
-        });
-  
-        this.templateContext.dispatchEvent(toast);
+        try {
+            const toast = new ShowToastEvent({
+                title: 'Error',
+                message: errorMessage,
+                variant: "error",
+                mode: "sticky"
+            });
+    
+            this.templateContext.dispatchEvent(toast);
+        }catch(err) {
+            console.error(err.oby ? err.body.message : err.message);
+        }
     }
 }
 
