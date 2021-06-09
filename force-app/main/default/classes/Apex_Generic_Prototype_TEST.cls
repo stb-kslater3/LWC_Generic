@@ -94,6 +94,8 @@ private class Apex_Generic_Prototype_TEST {
     static void testFieldsToSelect_BaseCase() {
     String[] fields = new List<String>{ 'Name', 'AccountId', 'RecordTypeId' };
 
+    String fieldsSelected = Apex_Generic_Prototype.fieldsToSelect(fields);
+
     System.assert(true);
   }
 
@@ -231,6 +233,29 @@ private class Apex_Generic_Prototype_TEST {
 
       System.assert(true);
     }
+
+
+// --------------------------------------------------------------------------------
+// ------------------------------- Delete Records -------------------------------------
+// --------------------------------------------------------------------------------
+  @isTest(SeeAllData=true)
+  static void testDeleteRecord_BaseCase() {
+    AdminPO__c[] some = [
+      SELECT Id
+      FROM AdminPO__c
+      LIMIT 5
+    ];
+
+    List<Id> ids = new List<Id>();
+
+    for(AdminPO__c admin : some) {
+      ids.add(admin.Id);
+    }
+
+    Apex_Generic_Prototype.deleteRecords('AdminPO__c', ids);
+
+    System.assert(true);
+  }
 
 }
 

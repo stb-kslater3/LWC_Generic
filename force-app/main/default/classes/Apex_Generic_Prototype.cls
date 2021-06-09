@@ -341,4 +341,31 @@ System.debug(dateString);
         throw new AuraHandledException(e.getMessage());
       }
     }
+
+
+    @AuraEnabled(cacheable=false)
+    public static Boolean deleteRecords(String objectName, Id[] toDelete) {
+      Boolean areDeleted = true;
+      List<sObject> recordObjects = new List<sObject>();
+
+      try {
+        for(Id recId : toDelete) {
+          recordObjects.add( (sObject) Type.forName(objectName).newInstance() );
+
+          recordObjects.get(recordObjects.size() - 1).put('Id', recId);
+        }
+
+        Database.DeleteResult[] results = Database.delete(recordObjects, true);
+
+        for(Database.DeleteResult result : results) {
+          if (!result.isSuccess()) {
+            areDeleted = false;
+          }
+        }
+        
+        return areDeleted;
+      } catch (Exception e) {
+        throw new AuraHandledException(e.getMessage());
+      }
+    }
   }
