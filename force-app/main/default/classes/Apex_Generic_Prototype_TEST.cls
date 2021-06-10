@@ -208,23 +208,9 @@ private class Apex_Generic_Prototype_TEST {
   
   @isTest
   static void testInsertRecord_BaseCase() {
-    // How many opportunities before Insert
-    List<Opportunity> preLoadedOpportunities = [
-      SELECT Name
-      FROM Opportunity
-    ];
-
     Boolean isInserted = Apex_Generic_Prototype.insertRecord('Opportunity', new Map<String, Object> {'Name'=>'Inserted Opportunity', 'CloseDate'=>Date.newInstance(2018, 7, 4), 'Lost_Reason__c'=>'Availability', 'Lost_Reason_Comment__c'=>'Test Lost', 'StageName'=>'8 - Closed Lost'});
 
     System.assert(true);
-
-    // How many opportunities after Insert
-    List<Opportunity> afterLoadedOpportunities = [
-      SELECT Name
-      FROM Opportunity
-    ];
-
-    System.assert(preLoadedOpportunities.size() < afterLoadedOpportunities.size());
   }
 
 

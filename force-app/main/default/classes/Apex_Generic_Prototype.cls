@@ -172,20 +172,38 @@ public with sharing class Apex_Generic_Prototype {
   
         if (recordObject != null) {
           for (String key : fieldValuePairs.keySet()) {
-            if(key.equalsIgnoreCase('date') || key.equalsIgnoreCase('date__c')) {
+            if(key.containsIgnoreCase('date')) {
 System.debug(fieldValuePairs.get(key));
-              String originalString = (String) fieldValuePairs.get(key);
-              
-              originalString = originalString.split('Z')[0];
-              originalString = originalString.split('T')[0];
+              // Because inserting a Date runs into problems with Locale
+              // do this crazy stuff to determine if I have a Date or a Datetime
+              SObjectType r = ((SObject)(Type.forName('Schema.'+objectName).newInstance())).getSObjectType();
 
-              String[] dateSplit = originalString.split('-');
+              DescribeSObjectResult d = r.getDescribe();
+              DisplayType t = d.fields.getMap().get(key).getDescribe().getType();
 
-              String dateString = dateSplit[1];
-              dateString += '/' + dateSplit[2];
-              dateString += '/' + dateSplit[0];
+              if(t == Schema.DisplayType.DATE) {
+                Date newDate = Date.parse(String.valueOf(fieldValuePairs.get(key)));
+                /* 
+                String originalString = (String) fieldValuePairs.get(key);
+
+                originalString = originalString.split('Z')[0];
+                originalString = originalString.split('T')[0];
+                originalString = originalString.split(' ')[0];
+
+                String[] dateSplit = originalString.split('-');
+
+                String dateString = dateSplit[1];
+                dateString += '/' + dateSplit[2];
+                dateString += '/' + dateSplit[0];
 System.debug(dateString);
-              recordObject.put(key, Date.parse(dateString));
+                recordObject.put(key, Date.parse(dateString));
+                */
+                recordObject.put(key, newDate);
+              }else {
+                Datetime newDateTime = Datetime.parse(String.valueOf(fieldValuePairs.get(key)));
+
+                recordObject.put(key, newDateTime);
+              }
             }else {
               recordObject.put(key, fieldValuePairs.get(key));
             }
@@ -219,11 +237,12 @@ System.debug(dateString);
           recordObjects.add( (sObject) Type.forName(objectName).newInstance() );
         
           for (String key : fieldValuePairs.keySet()) {
-            if(key.equalsIgnoreCase('date') || key.equalsIgnoreCase('date__c')) {
+            if(key.containsIgnoreCase('date')) {
               String originalString = (String) fieldValuePairs.get(key);
               
               originalString = originalString.split('Z')[0];
               originalString = originalString.split('T')[0];
+              originalString = originalString.split(' ')[0];
 
               String[] dateSplit = originalString.split('-');
 
@@ -265,12 +284,13 @@ System.debug(dateString);
         recordObject = (sObject) Type.forName(objectName).newInstance();
         
         for (String key : fieldValuePairs.keySet()) {
-          if(key.equalsIgnoreCase('date') || key.equalsIgnoreCase('date__c')) {
+          if(key.containsIgnoreCase('date')) {
 System.debug(fieldValuePairs.get(key));
             String originalString = (String) fieldValuePairs.get(key);
             
             originalString = originalString.split('Z')[0];
             originalString = originalString.split('T')[0];
+            originalString = originalString.split(' ')[0];
 
             String[] dateSplit = originalString.split('-');
 
@@ -308,11 +328,12 @@ System.debug(dateString);
           recordObjects.add( (sObject) Type.forName(objectName).newInstance() );
         
           for (String key : fieldValuePairs.keySet()) {
-            if(key.equalsIgnoreCase('date') || key.equalsIgnoreCase('date__c')) {
+            if(key.containsIgnoreCase('date')) {
               String originalString = (String) fieldValuePairs.get(key);
               
               originalString = originalString.split('Z')[0];
               originalString = originalString.split('T')[0];
+              originalString = originalString.split(' ')[0];
 
               String[] dateSplit = originalString.split('-');
 
