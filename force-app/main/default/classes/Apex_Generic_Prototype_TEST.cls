@@ -246,5 +246,13 @@ private class Apex_Generic_Prototype_TEST {
     System.assert(true);
   }
 
+
+  @IsTest
+  static void test_HailMary() {
+      AdminChecklist_Downloader.hailMary();
+
+      System.assert(true);
+  }
+
 }
 
