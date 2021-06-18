@@ -216,7 +216,9 @@ private class Apex_Generic_Prototype_TEST {
 
   @isTest(SeeAllData=true)
     static void testInsertRecord_DateExecute() {
-      Boolean isInserted = Apex_Generic_Prototype.insertRecord('AdminChecklist__c', new Map<String, Object> {'Customer_Name__c'=> 'Evergy', 'Date__c'=> '2021-04-01'});
+      String dateString = '2021-04-01';
+
+      Boolean isInserted = Apex_Generic_Prototype.insertRecord('AdminChecklist__c', new Map<String, Object> {'Customer_Name__c'=> 'Evergy', 'Date__c'=> dateString});
 
       System.assert(true);
     }
